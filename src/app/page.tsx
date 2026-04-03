@@ -732,6 +732,8 @@ function HomeFeed({ user, profile, onAuthRequired, onPlayRadio, onPlayTV, curren
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set())
   const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set())
   const [followingIds, setFollowingIds] = useState<string[]>([])
+
+  const trends = ['All', ...Array.from(new Set(posts.map(p => p.chatroom_tag).filter((t): t is string => !!t)))]
   
 
   useEffect(() => { loadPosts() }, [feedTab, followingIds])
@@ -887,7 +889,7 @@ function HomeFeed({ user, profile, onAuthRequired, onPlayRadio, onPlayTV, curren
         ))}
 
         {/* Posts */}
-        {!loading && posts.map(post => (
+        {!loading && posts.filter(post => activeFilter === 'All' || post.chatroom_tag === activeFilter).map(post => (
           <PostCard key={post.id} post={post}
             liked={likedPosts.has(post.id)}
             saved={savedPosts.has(post.id)}
