@@ -541,7 +541,7 @@ function HomeFeed({ user, profile, onAuthRequired, onPlayRadio, onPlayTV, curren
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set())
   const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set())
   const [followingIds, setFollowingIds] = useState<string[]>([])
-  const trends = ['#VillageArt','#WebDev','#AI2026','#DigitalNomad','#CryptoTalk','#FutureTech']
+  
 
   useEffect(() => { loadPosts() }, [feedTab, followingIds])
   useEffect(() => {
