@@ -4246,12 +4246,15 @@ function NotifModal({ user, onClose }: { user: any; onClose: () => void }) {
             const { icon, color } = notifIcon(n.type)
             return (
               <div key={n.id} style={{
-                display: 'flex', gap: 12, padding: '11px 0',
-                borderBottom: i < notifs.length - 1 ? '0.5px solid var(--border)' : 'none',
-                alignItems: 'flex-start',
-                background: n.is_read ? 'transparent' : 'rgba(58,171,58,0.04)',
-                borderRadius: 8, margin: '0 -4px', padding: '11px 4px',
-              }}>
+  display: 'flex',
+  gap: 12,
+  borderBottom: i < notifs.length - 1 ? '0.5px solid var(--border)' : 'none',
+  alignItems: 'flex-start',
+  background: n.is_read ? 'transparent' : 'rgba(58,171,58,0.04)',
+  borderRadius: 8,
+  margin: '0 -4px',
+  padding: '11px 4px',
+}}>
                 {n.actor?.avatar_url ? (
                   <div style={{ position: 'relative', flexShrink: 0 }}>
                     <img src={n.actor.avatar_url} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
