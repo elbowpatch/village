@@ -292,14 +292,40 @@ export default function VillageApp() {
       {/* TOP BAR */}
       <header style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: dark ? 'rgba(0,0,0,0.92)' : 'rgba(242,242,247,0.92)',
+        background: dark ? 'rgba(10,17,10,0.95)' : 'rgba(240,247,240,0.95)',
         backdropFilter: 'blur(30px) saturate(1.8)',
-        borderBottom: `0.5px solid ${dark ? 'rgba(255,255,255,0.12)' : 'rgba(60,60,67,0.2)'}`,
+        borderBottom: `0.5px solid ${dark ? 'rgba(80,160,80,0.15)' : 'rgba(60,100,60,0.15)'}`,
         padding: '0 20px', height: 56,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.3px' }}>
-          Village<span style={{ color: 'var(--accent)' }}>.</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Village logo — houses SVG, transparent bg */}
+          <svg width="32" height="32" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Orange house */}
+            <polygon points="55,95 15,95 35,60" fill="#f26b1d"/>
+            <rect x="17" y="95" width="36" height="38" fill="#fff" rx="3"/>
+            <circle cx="30" cy="108" r="3" fill="#f26b1d"/>
+            <path d="M28 115 Q35 111 42 115" stroke="#f26b1d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <rect x="39" y="58" width="5" height="8" rx="2" fill="#f26b1d"/>
+            {/* Green house */}
+            <polygon points="148,90 108,90 128,55" fill="#3aab3a"/>
+            <rect x="110" y="90" width="36" height="38" fill="#fff" rx="3"/>
+            <circle cx="123" cy="103" r="3" fill="#3aab3a"/>
+            <path d="M121 110 Q128 106 135 110" stroke="#3aab3a" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <rect x="130" y="53" width="5" height="8" rx="2" fill="#3aab3a"/>
+            {/* Blue center house */}
+            <polygon points="100,130 65,130 82.5,98" fill="#2da0d8"/>
+            <rect x="67" y="130" width="33" height="32" fill="#fff" rx="3"/>
+            <circle cx="78" cy="141" r="2.5" fill="#2da0d8"/>
+            <path d="M76 148 Q83.5 144 91 148" stroke="#2da0d8" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            {/* Leaves */}
+            <ellipse cx="45" cy="148" rx="28" ry="14" fill="#5dc45d" opacity="0.85"/>
+            <ellipse cx="155" cy="145" rx="28" ry="14" fill="#5dc45d" opacity="0.85"/>
+            <ellipse cx="100" cy="168" rx="22" ry="11" fill="#3aab3a" opacity="0.9"/>
+          </svg>
+          <span style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.4px', color: 'var(--text)' }}>
+            Village<span style={{ color: 'var(--accent)' }}>.</span>
+          </span>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <button className="icon-btn" style={{ position: 'relative' }} onClick={() => setNotifModal(true)}>
@@ -402,7 +428,7 @@ export default function VillageApp() {
       </nav>
 
       {/* MAIN CONTENT */}
-      <main className={`with-sidebar${sidebarCollapsed ? ' collapsed' : ''}`} style={{ flex: 1, overflowY: 'auto', paddingBottom: (radioStation || tvChannel) ? 'calc(83px + 64px + 20px)' : 'calc(83px + 20px)' }}>
+      <main className={`with-sidebar${sidebarCollapsed ? ' collapsed' : ''}`} style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(83px + 20px)' }}>
         {page === 'home' && <HomeFeed user={user} profile={profile} onAuthRequired={() => setAuthModal('login')} onPlayRadio={playStation} onPlayTV={playTVChannel} currentRadio={radioStation} currentTV={tvChannel} />}
         {page === 'news' && <NewsPage />}
         {page === 'messages' && <MessagesPage user={user} profile={profile} />}
@@ -414,8 +440,8 @@ export default function VillageApp() {
       {/* BOTTOM NAV (mobile only) */}
       <nav className="bottom-nav-desktop-hidden" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-        background: dark ? 'rgba(28,28,30,0.95)' : 'rgba(248,248,248,0.95)',
-        borderTop: `0.5px solid ${dark ? 'rgba(255,255,255,0.12)' : 'rgba(60,60,67,0.22)'}`,
+        background: dark ? 'rgba(10,17,10,0.97)' : 'rgba(240,247,240,0.97)',
+        borderTop: `0.5px solid ${dark ? 'rgba(80,160,80,0.18)' : 'rgba(60,100,60,0.2)'}`,
         display: 'flex', padding: '8px 0 env(safe-area-inset-bottom, 8px)',
         backdropFilter: 'blur(30px) saturate(2)',
       }}>
@@ -451,102 +477,137 @@ export default function VillageApp() {
         ))}
       </nav>
 
-      {/* MEDIA MINI PLAYER */}
+      {/* POPUP PLAYER — square on desktop, floating bar on mobile */}
       {(radioStation || tvChannel) && (
-        <div style={{
-          position: 'fixed', bottom: 'calc(var(--nav-h))', left: 0, right: 0, zIndex: 190,
-          background: dark ? 'rgba(12,12,14,0.98)' : 'rgba(255,255,255,0.98)',
-          backdropFilter: 'blur(24px) saturate(1.8)',
-          borderTop: '0.5px solid var(--border)',
-          padding: '0 16px',
-          height: 64,
-          display: 'flex', alignItems: 'center', gap: 12,
-          boxShadow: '0 -6px 24px rgba(0,0,0,0.14)',
-        }}>
+        <div className="popup-player">
           {radioStation && (
-            <>
-              {/* Radio favicon */}
-              <div style={{
-                width: 40, height: 40, borderRadius: 10, flexShrink: 0, overflow: 'hidden',
-                background: 'linear-gradient(135deg,var(--accent5),var(--accent))',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
+            <div className="popup-player-inner">
+              {/* Art panel — desktop square top, mobile left thumb */}
+              <div className="popup-player-art" style={{
+                background: 'linear-gradient(135deg, var(--accent5), var(--accent))',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {radioStation.favicon
                   ? <img src={radioStation.favicon} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                  : <Icon name="radio" size={18} color="#fff" />}
+                  : <Icon name="radio" size={28} color="#fff" />}
                 {radioPlaying && (
                   <div style={{
-                    position: 'absolute', bottom: 3, right: 3, width: 8, height: 8, borderRadius: '50%',
-                    background: 'var(--accent3)', boxShadow: '0 0 6px var(--accent3)',
+                    position: 'absolute', bottom: 6, right: 6, width: 9, height: 9, borderRadius: '50%',
+                    background: '#3aab3a', boxShadow: '0 0 8px #3aab3a',
                     animation: 'pulse-dot 1.4s ease-in-out infinite',
                   }} />
                 )}
               </div>
-              {/* Radio info */}
-              <div style={{ flex: 1, overflow: 'hidden' }}>
-                <div style={{ fontSize: '0.72rem', color: 'var(--accent)', fontWeight: 700, marginBottom: 1, letterSpacing: '0.3px' }}>RADIO</div>
-                <div style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{radioStation.name}</div>
-                <div style={{ fontSize: '0.69rem', color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {[radioStation.country, radioStation.bitrate ? `${radioStation.bitrate}kbps` : null].filter(Boolean).join(' · ')}
+
+              {/* Mobile bar content */}
+              <div className="popup-player-bar-content" style={{ alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.4px' }}>RADIO</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{radioStation.name}</div>
+                </div>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                  <button className="icon-btn" onClick={toggleRadioPlay}
+                    style={{ background: 'var(--accent)', width: 36, height: 36 }}>
+                    <Icon name={radioPlaying ? 'pause' : 'play'} size={14} color="#fff" />
+                  </button>
+                  <button className="icon-btn" onClick={stopRadio}>
+                    <Icon name="x" size={14} />
+                  </button>
                 </div>
               </div>
-              {/* Radio controls */}
-              <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
-                <button className="icon-btn" onClick={() => setRadioMuted(m => !m)}>
-                  <Icon name={radioMuted ? 'volume-x' : 'volume-2'} size={15} />
-                </button>
-                <button className="icon-btn" onClick={toggleRadioPlay}
-                  style={{ background: 'var(--accent)', width: 36, height: 36 }}>
-                  <Icon name={radioPlaying ? 'pause' : 'play'} size={15} color="#fff" />
-                </button>
-                <button className="icon-btn" onClick={stopRadio}>
-                  <Icon name="x" size={15} />
-                </button>
+
+              {/* Desktop square content */}
+              <div className="popup-player-square-content">
+                <div className="popup-player-square-header">
+                  <div style={{ overflow: 'hidden' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.5px', marginBottom: 2 }}>RADIO</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{radioStation.name}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text3)', marginTop: 2 }}>
+                      {[radioStation.country, radioStation.bitrate ? `${radioStation.bitrate}kbps` : null].filter(Boolean).join(' · ')}
+                    </div>
+                  </div>
+                  <button className="icon-btn" onClick={stopRadio} style={{ flexShrink: 0 }}>
+                    <Icon name="x" size={13} />
+                  </button>
+                </div>
+                <div className="popup-player-controls">
+                  <button className="icon-btn" onClick={() => setRadioMuted(m => !m)}>
+                    <Icon name={radioMuted ? 'volume-x' : 'volume-2'} size={15} />
+                  </button>
+                  <button className="icon-btn" onClick={toggleRadioPlay}
+                    style={{ background: 'var(--accent)', width: 44, height: 44, borderRadius: '50%' }}>
+                    <Icon name={radioPlaying ? 'pause' : 'play'} size={18} color="#fff" />
+                  </button>
+                  <button className="icon-btn" style={{ opacity: 0.4, cursor: 'default' }}>
+                    <Icon name="skip-forward" size={15} />
+                  </button>
+                </div>
               </div>
-            </>
+            </div>
           )}
 
           {tvChannel && (
-            <>
-              {/* TV thumbnail + live video */}
-              <div style={{
-                width: 60, height: 40, borderRadius: 8, flexShrink: 0, overflow: 'hidden',
-                background: '#000', position: 'relative',
-              }}>
+            <div className="popup-player-inner">
+              {/* TV art — live video thumb on desktop, small on mobile */}
+              <div className="popup-player-art" style={{ background: '#000', position: 'relative' }}>
                 <video
                   ref={tvVideoRef}
                   autoPlay playsInline muted={tvMuted}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
                 <div style={{
-                  position: 'absolute', top: 3, left: 4,
+                  position: 'absolute', top: 6, left: 6,
                   background: 'var(--accent2)', color: '#fff',
-                  fontSize: '0.5rem', fontWeight: 800, padding: '1px 4px', borderRadius: 3, letterSpacing: '0.5px',
+                  fontSize: '0.52rem', fontWeight: 800, padding: '2px 5px', borderRadius: 4, letterSpacing: '0.6px',
                 }}>LIVE</div>
               </div>
-              {/* TV info */}
-              <div style={{ flex: 1, overflow: 'hidden' }}>
-                <div style={{ fontSize: '0.72rem', color: 'var(--accent2)', fontWeight: 700, marginBottom: 1, letterSpacing: '0.3px' }}>TV</div>
-                <div style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tvChannel.name}</div>
-                <div style={{ fontSize: '0.69rem', color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {[tvChannel.country, tvChannel.group].filter(Boolean).join(' · ')}
+
+              {/* Mobile bar content */}
+              <div className="popup-player-bar-content" style={{ alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--accent2)', fontWeight: 700, letterSpacing: '0.4px' }}>TV</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tvChannel.name}</div>
+                </div>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                  <button className="icon-btn" onClick={() => setTVFullscreen(f => !f)}
+                    style={{ background: 'var(--accent2)', width: 36, height: 36 }}>
+                    <Icon name="maximize" size={14} color="#fff" />
+                  </button>
+                  <button className="icon-btn" onClick={stopTV}>
+                    <Icon name="x" size={14} />
+                  </button>
                 </div>
               </div>
-              {/* TV controls */}
-              <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
-                <button className="icon-btn" onClick={() => setTVMuted(m => !m)}>
-                  <Icon name={tvMuted ? 'volume-x' : 'volume-2'} size={15} />
-                </button>
-                <button className="icon-btn" onClick={() => setTVFullscreen(f => !f)}
-                  style={{ background: 'var(--accent2)', width: 36, height: 36 }}>
-                  <Icon name="maximize" size={15} color="#fff" />
-                </button>
-                <button className="icon-btn" onClick={stopTV}>
-                  <Icon name="x" size={15} />
-                </button>
+
+              {/* Desktop square content */}
+              <div className="popup-player-square-content">
+                <div className="popup-player-square-header">
+                  <div style={{ overflow: 'hidden' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--accent2)', fontWeight: 700, letterSpacing: '0.5px', marginBottom: 2 }}>TV — LIVE</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tvChannel.name}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text3)', marginTop: 2 }}>
+                      {[tvChannel.country, tvChannel.group].filter(Boolean).join(' · ')}
+                    </div>
+                  </div>
+                  <button className="icon-btn" onClick={stopTV} style={{ flexShrink: 0 }}>
+                    <Icon name="x" size={13} />
+                  </button>
+                </div>
+                <div className="popup-player-controls">
+                  <button className="icon-btn" onClick={() => setTVMuted(m => !m)}>
+                    <Icon name={tvMuted ? 'volume-x' : 'volume-2'} size={15} />
+                  </button>
+                  <button className="icon-btn" onClick={() => setTVFullscreen(f => !f)}
+                    style={{ background: 'var(--accent2)', width: 44, height: 44, borderRadius: '50%' }}>
+                    <Icon name="maximize" size={18} color="#fff" />
+                  </button>
+                  <button className="icon-btn" style={{ opacity: 0.4, cursor: 'default' }}>
+                    <Icon name="cast" size={15} />
+                  </button>
+                </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       )}
