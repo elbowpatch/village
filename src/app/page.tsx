@@ -647,7 +647,7 @@ function HomeFeed({ user, profile, onAuthRequired, onPlayRadio, onPlayTV, curren
             borderBottom: feedTab === tab ? '2px solid var(--accent)' : '2px solid transparent',
             transition: 'all 0.2s',
           }}>
-            {tab === 'top' ? '🔥 Top Posts' : '👥 Following'}
+            {tab === 'top' ? ' Top Posts' : ' Following'}
           </button>
         ))}
       </div>
