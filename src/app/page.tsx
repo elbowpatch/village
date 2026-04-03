@@ -125,7 +125,7 @@ type MediaTab = 'radio' | 'tv'
 
 // ─── MAIN APP ────────────────────────────────────────────────────────────────
 
-type Page = 'home' | 'chatrooms' | 'messages' | 'news' | 'art' | 'media'
+type Page = 'home' | 'chatrooms' | 'messages' | 'news' | 'art' | 'media' | 'profile'
 
 export default function VillageApp() {
   const [dark, setDark] = useState(false)
