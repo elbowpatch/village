@@ -674,7 +674,7 @@ function HomeFeed({ user, profile, onAuthRequired, onPlayRadio, onPlayTV, curren
         {/* Top empty state */}
         {feedTab === 'top' && !loading && posts.length === 0 && (
           <div className="empty-state">
-            <div style={{ fontSize: '3rem', marginBottom: 12 }}>🌿</div>
+            <div style={{ fontSize: '3rem', marginBottom: 12 }}></div>
             <div className="empty-title">No posts yet</div>
             <div className="empty-sub">Be the first to share something with the community.</div>
           </div>
