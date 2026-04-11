@@ -341,15 +341,22 @@ export default function ChitChatApp() {
         }, 350)
       }
     }
+    function onOpenDM(e: Event) {
+      setPage('messages')
+      const targetProfile = (e as CustomEvent).detail?.profile
+      if (targetProfile) { (window as any).__pendingDMProfile = targetProfile }
+    }
     window.addEventListener('toggle-dark', onToggleDark)
     window.addEventListener('change-accent', onChangeAccent)
     window.addEventListener('open-notifications', onOpenNotifications)
     window.addEventListener('navigate-to-post', onNavigateToPost)
+    window.addEventListener('open-dm', onOpenDM)
     return () => {
       window.removeEventListener('toggle-dark', onToggleDark)
       window.removeEventListener('change-accent', onChangeAccent)
       window.removeEventListener('open-notifications', onOpenNotifications)
       window.removeEventListener('navigate-to-post', onNavigateToPost)
+      window.removeEventListener('open-dm', onOpenDM)
     }
   }, [dark, accentColor])
 
@@ -1290,6 +1297,9 @@ function HomeFeed({ user, profile, onAuthRequired, onPlayRadio, onPlayTV, curren
 
   const trends = ['All', ...Array.from(new Set(posts.map(p => p.chatroom_tag).filter((t): t is string => !!t)))]
   
+  // Keep a ref to feedTab so the realtime callback always reads the latest value (avoids stale closure)
+  const feedTabRef = useRef<FeedTab>('top')
+  useEffect(() => { feedTabRef.current = feedTab }, [feedTab])
 
   useEffect(() => { setPage(0); setPosts([]); setHasMore(true); loadPosts(0) }, [feedTab, followingIds])
   useEffect(() => {
@@ -1323,8 +1333,9 @@ function HomeFeed({ user, profile, onAuthRequired, onPlayRadio, onPlayTV, curren
     const { data } = await supabase.from('posts').select('*, profiles(*)').eq('id', id).single()
     if (data) {
       const post = data as Post
-      if (feedTab === 'top') {
-        setPosts(prev => [post, ...prev])
+      if (feedTabRef.current === 'top') {
+        // Deduplicate: only prepend if not already in the list
+        setPosts(prev => prev.some(p => p.id === post.id) ? prev : [post, ...prev])
       }
     }
   }
@@ -2106,14 +2117,31 @@ function PostCard({ post, liked, reposted, onLike, onRepost, user, profile, onAu
         {/* Follow btn + menu */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           {!isOwnPost && p && (
-            <button onClick={handleFollow} disabled={followLoading} style={{
-              padding: '4px 12px', borderRadius: 99, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
-              border: followingAuthor ? '1.5px solid var(--border)' : '1.5px solid var(--accent)',
-              background: followingAuthor ? 'transparent' : 'var(--accent)',
-              color: followingAuthor ? 'var(--text)' : '#fff',
-              transition: 'all 0.18s', opacity: followLoading ? 0.6 : 1,
-              fontFamily: "'Plus Jakarta Sans',sans-serif",
-            }}>{followingAuthor ? 'Following' : 'Follow'}</button>
+            <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+              <button
+                onClick={() => {
+                  if (!user) { onAuthRequired(); return }
+                  window.dispatchEvent(new CustomEvent('open-dm', { detail: { profile: p } }))
+                }}
+                title={`Message ${p.display_name}`}
+                style={{
+                  width: 28, height: 28, borderRadius: '50%', cursor: 'pointer',
+                  border: '1.5px solid var(--border)', background: 'var(--bg)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.18s', flexShrink: 0,
+                }}
+              >
+                <Icon name="mail" size={13} color="var(--text2)" />
+              </button>
+              <button onClick={handleFollow} disabled={followLoading} style={{
+                padding: '4px 12px', borderRadius: 99, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
+                border: followingAuthor ? '1.5px solid var(--border)' : '1.5px solid var(--accent)',
+                background: followingAuthor ? 'transparent' : 'var(--accent)',
+                color: followingAuthor ? 'var(--text)' : '#fff',
+                transition: 'all 0.18s', opacity: followLoading ? 0.6 : 1,
+                fontFamily: "'Plus Jakarta Sans',sans-serif",
+              }}>{followingAuthor ? 'Following' : 'Follow'}</button>
+            </div>
           )}
           <div style={{ position: 'relative' }} ref={menuRef}>
             <button onClick={() => setPostMenu(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: 'var(--text3)' }}>
@@ -2679,7 +2707,18 @@ function MessagesPage({ user, profile }: { user: any; profile: Profile | null })
   const [openConvo, setOpenConvo] = useState<Conversation | null>(null)
   const [newDMModal, setNewDMModal] = useState(false)
 
-  useEffect(() => { if (user) loadConvos() }, [user])
+  useEffect(() => {
+    if (user) {
+      loadConvos().then(() => {
+        // Auto-open conversation if navigated here via message button
+        const pending = (window as any).__pendingDMProfile
+        if (pending) {
+          delete (window as any).__pendingDMProfile
+          openConvoWithUser(pending)
+        }
+      })
+    }
+  }, [user])
 
   async function loadConvos() {
     setLoading(true)
